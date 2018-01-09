@@ -1,0 +1,66 @@
+﻿Names Default To Here( 1 );
+New SQL Query(
+	Version( 130 ),
+	Connection(
+		"ODBC:DSN=Azure Adventureworks;Description=Azure remote;UID=sqlfamily;PWD=%_PWD_%;APP=JMP;WSID=ROB-LATT-E5440;DATABASE=AdventureWorks2012;"
+	),
+	QueryName( "Components Analysis" ),
+	Select(
+		Column( "ProductID", "t1" ),
+		Column( "Name", "t1", Alias( "Product name" ) ),
+		Column( "ProductSubcategoryID", "t1" ),
+		Column( "Name", "t3", Alias( "Subcategory name" ) ),
+		Column( "MakeFlag", "t1" ),
+		Column( "StandardCost", "t1" ),
+		Column( "ListPrice", "t1" ),
+		Column( "DaysToManufacture", "t1" ),
+		Column( "AverageLeadTime", "t4" ),
+		Column( "StandardPrice", "t4" ),
+		Column( "BusinessEntityID", "t4" ),
+		Column( "Name", "t2", Alias( "Category name" ) )
+	),
+	From(
+		Table( "Product", Schema( "Production" ), Alias( "t1" ) ),
+		Table(
+			"ProductVendor",
+			Schema( "Purchasing" ),
+			Alias( "t4" ),
+			Join(
+				Type( Left Outer ),
+				EQ( Column( "ProductID", "t1" ), Column( "ProductID", "t4" ) )
+			)
+		),
+		Table(
+			"ProductSubcategory",
+			Schema( "Production" ),
+			Alias( "t3" ),
+			Join(
+				Type( Left Outer ),
+				EQ(
+					Column( "ProductSubcategoryID", "t3" ),
+					Column( "ProductSubcategoryID", "t1" )
+				)
+			)
+		),
+		Table(
+			"ProductCategory",
+			Schema( "Production" ),
+			Alias( "t2" ),
+			Join(
+				Type( Left Outer ),
+				EQ(
+					Column( "ProductCategoryID", "t3" ),
+					Column( "ProductCategoryID", "t2" )
+				)
+			)
+		)
+	),
+	Where(
+		In List(
+			Column( "Name", "t2", Alias( "Category name" ) ),
+			{"Components"},
+			UI( SelectListFilter( ListBox, Base( "Categorical" ) ) )
+		)
+	),
+	Order By( Column( "MakeFlag", "t1", Order( "Ascending" ) ) )
+);
