@@ -1,0 +1,83 @@
+﻿Names Default To Here( 1 );
+New SQL Query(
+	Version( 130 ),
+	Connection( "JMP" ),
+	JMP Tables(
+		["country-codes" => "country-codes.jmp",
+		"List_of_IOC_country_codes 2" => "List_of_IOC_country_codes 2.jmp",
+		"Medals by Country & Year" => "Medals by Country & Year.jmp",
+		"WDI Wide Olympic Years" => "WDI Wide Olympic Years.jmp"]
+	),
+	QueryName( "Olympics Query" ),
+	Select(
+		Column( "Country Name", "t4" ),
+		Column( "Country Code", "t4" ),
+		Column( "Year", "t4", Analysis Type( "Ordinal" ) ),
+		Column( "Code", "t1" ),
+		Column( "Flag", "t1", Analysis Type( "None" ) ),
+		Column( "TotMedals", "t3", Numeric Format( "Fixed Dec", "0", "NO", "" ) ),
+		Column( "N(Medal, Men)", "t3" ),
+		Column( "N(Medal, Women)", "t3" ),
+		Column( "GDP per capita (constant 2005 US$)", "t4" ),
+		Column( "GINI index (World Bank estimate)", "t4" ),
+		Column( "GNI per capita (constant 2005 US$)", "t4" ),
+		Column( "GNI per capita growth (annual %)", "t4" ),
+		Column( "Adjusted net national income (current US$)", "t4" ),
+		Column( "GNI per capita, PPP (constant 2011 international $)", "t4" ),
+		Column( "GNI, Atlas method (current US$)", "t4" ),
+		Column( "GNI, PPP (constant 2011 international $)", "t4" ),
+		Column( "Gross capital formation (current US$)", "t4" ),
+		Column( "Gross enrolment ratio, primary, gender parity index (GPI)", "t4" ),
+		Column(
+			"Gross enrolment ratio, secondary, gender parity index (GPI)",
+			"t4"
+		),
+		Column( "Health expenditure per capita (current US$)", "t4" ),
+		Column( "Life expectancy at birth, female (years)", "t4" ),
+		Column( "Life expectancy at birth, male (years)", "t4" ),
+		Column( "Life expectancy at birth, total (years)", "t4" ),
+		Column(
+			"Percentage of students in secondary education who are female (%)",
+			"t4"
+		),
+		Column(
+			"Percentage of students in secondary general education who are female (%)",
+			"t4"
+		),
+		Column( "Population, total", "t4" )
+	),
+	From(
+		Table( "WDI Wide Olympic Years", Alias( "t4" ) ),
+		Table(
+			"country-codes",
+			Alias( "t2" ),
+			Join(
+				Type( Inner ),
+				EQ(
+					Column( "Country Code", "t4" ),
+					Column( "ISO3166-1-Alpha-3", "t2" )
+				)
+			)
+		),
+		Table(
+			"Medals by Country & Year",
+			Alias( "t3" ),
+			Join(
+				Type( Left Outer ),
+				EQ( Column( "Country Code", "t4" ), Column( "NOC", "t3" ) ) &
+				EQ(
+					Column( "Year", "t4", Analysis Type( "Ordinal" ) ),
+					Column( "Edition", "t3", Analysis Type( "Ordinal" ) )
+				)
+			)
+		),
+		Table(
+			"List_of_IOC_country_codes 2",
+			Alias( "t1" ),
+			Join(
+				Type( Inner ),
+				EQ( Column( "IOC", "t2" ), Column( "Code", "t1" ) )
+			)
+		)
+	)
+);
